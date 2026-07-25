@@ -141,15 +141,13 @@ export default function Navbar() {
     triggerHaptic('light');
     if (pathname === '/') {
       e.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     } else {
-      e.preventDefault();
-      router.push('/');
-      setTimeout(() => {
-        if (typeof window !== 'undefined') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      }, 80);
+      if (typeof window !== 'undefined') {
+        window.scrollTo(0, 0);
+      }
     }
   };
 

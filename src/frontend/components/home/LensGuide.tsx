@@ -105,12 +105,15 @@ export default function LensGuide() {
     },
   ];
 
-  // Scroll to index helper
+  // Scroll to index helper (Horizontal container scroll only - NEVER affects window page scroll)
   const scrollToIndex = (index: number) => {
     if (!scrollContainerRef.current) return;
-    const cards = scrollContainerRef.current.children;
+    const container = scrollContainerRef.current;
+    const cards = container.children;
     if (cards[index]) {
-      cards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      const card = cards[index] as HTMLElement;
+      const targetScrollLeft = card.offsetLeft - container.offsetWidth / 2 + card.offsetWidth / 2;
+      container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
       setActiveCardIndex(index);
     }
   };
@@ -141,10 +144,15 @@ export default function LensGuide() {
   };
 
   useEffect(() => {
-    // Initial centering of photochromic
-    setTimeout(() => {
-      scrollToIndex(2);
-    }, 200);
+    // Initial horizontal centering inside container only
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const cards = container.children;
+      if (cards[2]) {
+        const card = cards[2] as HTMLElement;
+        container.scrollLeft = card.offsetLeft - container.offsetWidth / 2 + card.offsetWidth / 2;
+      }
+    }
   }, []);
 
   return (

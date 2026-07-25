@@ -18,9 +18,27 @@ export function RealtimeHomeWrapper({ initialContent }: { initialContent: Record
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      window.scrollTo(0, 0);
-      const timer = setTimeout(() => window.scrollTo(0, 0), 50);
-      return () => clearTimeout(timer);
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+
+      const scrollToTopStrict = () => {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      };
+
+      scrollToTopStrict();
+
+      const t1 = setTimeout(scrollToTopStrict, 10);
+      const t2 = setTimeout(scrollToTopStrict, 50);
+      const t3 = setTimeout(scrollToTopStrict, 150);
+
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
     }
   }, []);
 
