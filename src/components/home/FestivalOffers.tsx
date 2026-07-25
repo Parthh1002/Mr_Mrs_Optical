@@ -159,11 +159,11 @@ export default function FestivalOffers({ content = {} }: { content?: Record<stri
             ))}
           </div>
 
-          {/* Action Button */}
+          {/* High-Contrast Luxury Button */}
           <Link href="/catalog">
             <Button
               size="lg"
-              className="rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-8 sm:px-10 py-6 text-sm sm:text-base gap-2 shadow-2xl hover:-translate-y-1 transition-all border-none cursor-pointer btn-brass-sweep"
+              className="rounded-full bg-[#F4EFE3] hover:bg-white text-[#0D1512] font-extrabold px-10 sm:px-12 py-6 text-sm sm:text-base gap-2.5 shadow-[0_10px_35px_rgba(0,0,0,0.35)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.45)] hover:scale-[1.04] transition-all duration-300 border border-white/60 cursor-pointer uppercase tracking-wider"
             >
               <span>{ctaText}</span>
               <ArrowRight size={18} />
