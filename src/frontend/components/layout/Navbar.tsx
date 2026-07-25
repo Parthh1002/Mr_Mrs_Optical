@@ -821,7 +821,7 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[38] bg-black/40 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-[58] bg-black/60 backdrop-blur-md lg:hidden"
               onClick={() => setIsMobileMenuOpen(false)}
             />
 
@@ -830,89 +830,124 @@ export default function Navbar() {
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 260 }}
-              className="fixed inset-y-0 right-0 z-[39] w-[min(85vw,360px)] bg-background border-l border-border shadow-2xl lg:hidden flex flex-col overflow-y-auto"
+              transition={{ type: 'spring', damping: 28, stiffness: 250 }}
+              className="fixed inset-y-0 right-0 z-[59] w-[min(88vw,380px)] bg-card/98 backdrop-blur-2xl border-l border-primary/20 shadow-2xl lg:hidden flex flex-col overflow-y-auto text-foreground"
             >
-              <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-border">
+              {/* Drawer Top Header */}
+              <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-line">
                 <Logo />
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-lg hover:bg-muted transition-colors duration-200"
-                  aria-label="Close"
+                <div className="flex items-center gap-3">
+                  <ThemeToggle />
+                  <button
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="p-2 rounded-full bg-secondary hover:bg-primary/20 text-muted-foreground hover:text-foreground transition-all cursor-pointer border border-line"
+                    aria-label="Close Mobile Menu"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick Action Pills in Mobile Drawer */}
+              <div className="p-4 bg-secondary/40 border-b border-line flex gap-2">
+                <Button
+                  onClick={() => { setIsMobileMenuOpen(false); openBookingModal(); }}
+                  size="sm"
+                  className="flex-1 py-4 text-xs bg-primary text-primary-foreground font-bold rounded-xl btn-brass-sweep border-none shadow-md cursor-pointer gap-1.5"
                 >
-                  <X size={20} />
+                  <Sparkles size={14} />
+                  <span>Book Eye Test</span>
+                </Button>
+                <button
+                  onClick={() => { setIsMobileMenuOpen(false); setIsContactOpen(true); }}
+                  className="px-3.5 py-2 rounded-xl bg-background hover:bg-secondary text-foreground text-xs font-semibold border border-line flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Phone size={14} className="text-primary" />
+                  <span>Concierge</span>
                 </button>
               </div>
 
+              {/* Navigation List */}
               <nav className="flex flex-col px-4 py-4 gap-1 flex-1">
                 {/* 1. Home */}
                 <Link
                   href="/"
                   onClick={(e) => { setIsMobileMenuOpen(false); handleHomeClick(e); }}
-                  className="block py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                  className="flex items-center gap-3 py-3 px-3.5 text-base font-[family-name:var(--font-serif)] font-medium text-foreground hover:text-primary hover:bg-primary/10 rounded-2xl transition-all"
                 >
-                  Home
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xs">🏠</div>
+                  <span>Home</span>
                 </Link>
 
                 {/* 2. Collections (Expandable Accordion) */}
-                <div className="rounded-xl overflow-hidden">
+                <div className="rounded-2xl overflow-hidden">
                   <button
                     onClick={() => setMobileCollectionsOpen(!mobileCollectionsOpen)}
-                    className="w-full flex items-center justify-between py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                    className="w-full flex items-center justify-between py-3 px-3.5 text-base font-[family-name:var(--font-serif)] font-medium text-foreground hover:text-primary hover:bg-primary/10 rounded-2xl transition-all cursor-pointer"
                   >
-                    <span>Collections</span>
-                    <ChevronDown size={16} className={`transition-transform ${mobileCollectionsOpen ? 'rotate-180 text-primary' : ''}`} />
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xs">🕶️</div>
+                      <span>Collections</span>
+                    </div>
+                    <ChevronDown size={16} className={`transition-transform duration-200 ${mobileCollectionsOpen ? 'rotate-180 text-primary' : ''}`} />
                   </button>
                   {mobileCollectionsOpen && (
-                    <div className="pl-4 pr-2 py-2 space-y-2 bg-secondary/30 rounded-xl my-1 border border-line">
+                    <div className="pl-4 pr-2 py-2.5 space-y-2 bg-secondary/40 rounded-2xl my-1 border border-line">
                       {collectionCategories.map((cat, i) => (
                         <Link
                           key={i}
                           href={cat.href}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="block text-xs font-medium text-muted-foreground hover:text-primary py-1.5"
+                          className="flex items-center justify-between text-xs font-semibold text-muted-foreground hover:text-primary py-2 px-3 rounded-xl hover:bg-background/60 transition-colors"
                         >
-                          • {cat.name}
+                          <span>• {cat.name}</span>
+                          <ChevronRight size={13} className="text-primary/60" />
                         </Link>
                       ))}
                       <Link
                         href="/catalog"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="block text-xs font-bold text-primary py-1.5 border-t border-line mt-1"
+                        className="flex items-center justify-between text-xs font-bold text-primary py-2.5 px-3 border-t border-line mt-1 hover:underline"
                       >
-                        View All Collections →
+                        <span>View All Collections</span>
+                        <ArrowRight size={13} />
                       </Link>
                     </div>
                   )}
                 </div>
 
                 {/* 3. Services (Expandable Accordion) */}
-                <div className="rounded-xl overflow-hidden">
+                <div className="rounded-2xl overflow-hidden">
                   <button
                     onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
-                    className="w-full flex items-center justify-between py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                    className="w-full flex items-center justify-between py-3 px-3.5 text-base font-[family-name:var(--font-serif)] font-medium text-foreground hover:text-primary hover:bg-primary/10 rounded-2xl transition-all cursor-pointer"
                   >
-                    <span>Services</span>
-                    <ChevronDown size={16} className={`transition-transform ${mobileServicesOpen ? 'rotate-180 text-primary' : ''}`} />
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xs">🩺</div>
+                      <span>Services</span>
+                    </div>
+                    <ChevronDown size={16} className={`transition-transform duration-200 ${mobileServicesOpen ? 'rotate-180 text-primary' : ''}`} />
                   </button>
                   {mobileServicesOpen && (
-                    <div className="pl-4 pr-2 py-2 space-y-2 bg-secondary/30 rounded-xl my-1 border border-line">
+                    <div className="pl-4 pr-2 py-2.5 space-y-2 bg-secondary/40 rounded-2xl my-1 border border-line">
                       {serviceCategories.map((serv, i) => (
                         <Link
                           key={i}
                           href={serv.href}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="block text-xs font-medium text-muted-foreground hover:text-primary py-1.5"
+                          className="flex items-center justify-between text-xs font-semibold text-muted-foreground hover:text-primary py-2 px-3 rounded-xl hover:bg-background/60 transition-colors"
                         >
-                          • {serv.name}
+                          <span>• {serv.name}</span>
+                          <ChevronRight size={13} className="text-primary/60" />
                         </Link>
                       ))}
                       <Link
                         href="/services"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="block text-xs font-bold text-primary py-1.5 border-t border-line mt-1"
+                        className="flex items-center justify-between text-xs font-bold text-primary py-2.5 px-3 border-t border-line mt-1 hover:underline"
                       >
-                        View All Services →
+                        <span>View All Services</span>
+                        <ArrowRight size={13} />
                       </Link>
                     </div>
                   )}
@@ -922,43 +957,51 @@ export default function Navbar() {
                 <Link
                   href="/about"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                  className="flex items-center gap-3 py-3 px-3.5 text-base font-[family-name:var(--font-serif)] font-medium text-foreground hover:text-primary hover:bg-primary/10 rounded-2xl transition-all"
                 >
-                  Our Story
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xs">📖</div>
+                  <span>Our Story</span>
                 </Link>
 
                 {/* 5. Gallery */}
                 <Link
                   href="/gallery"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                  className="flex items-center gap-3 py-3 px-3.5 text-base font-[family-name:var(--font-serif)] font-medium text-foreground hover:text-primary hover:bg-primary/10 rounded-2xl transition-all"
                 >
-                  Gallery
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xs">📷</div>
+                  <span>Gallery</span>
                 </Link>
 
                 {/* 6. Offers */}
                 <Link
                   href="/offers"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                  className="flex items-center gap-3 py-3 px-3.5 text-base font-[family-name:var(--font-serif)] font-medium text-foreground hover:text-primary hover:bg-primary/10 rounded-2xl transition-all"
                 >
-                  Offers
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xs">🏷️</div>
+                  <span>Offers & Sales</span>
+                </Link>
+
+                {/* 7. Admin Portal Link */}
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-3 py-3 px-3.5 text-base font-[family-name:var(--font-serif)] font-medium text-primary hover:bg-primary/10 rounded-2xl transition-all border border-primary/20 mt-2"
+                >
+                  <ShieldCheck size={18} className="text-primary" />
+                  <span>Admin Portal</span>
                 </Link>
               </nav>
 
-              <div className="px-6 pb-8 space-y-3 border-t border-border pt-5">
+              {/* Drawer Sticky Footer */}
+              <div className="px-6 py-6 space-y-3 border-t border-line bg-card">
                 <Button
                   onClick={() => { setIsMobileMenuOpen(false); openBookingModal(); }}
-                  className="w-full py-6 text-sm bg-primary text-primary-foreground hover:bg-primary/90 btn-brass-sweep cursor-pointer border-none rounded-full font-semibold tracking-wider"
+                  className="w-full py-6 text-sm bg-primary text-primary-foreground hover:bg-primary/95 btn-brass-sweep cursor-pointer border-none rounded-2xl font-bold tracking-wider shadow-lg"
                 >
-                  Book Eye Test
+                  Book Eye Test Appointment
                 </Button>
-                <button
-                  onClick={() => { setIsMobileMenuOpen(false); setIsContactOpen(true); }}
-                  className="w-full py-3.5 text-sm border border-border hover:bg-muted rounded-full font-medium text-foreground transition-colors cursor-pointer"
-                >
-                  Call & Concierge Support
-                </button>
               </div>
             </motion.div>
           </>
