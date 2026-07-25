@@ -244,7 +244,7 @@ npm run build
 
 <div align="center">
 
-  Crafted with ❤️ for **Mr. & Mrs. Optical**<br />
+  Crafted with for **Mr. & Mrs. Optical**<br />
   *Delivering Luxury Vision & Unmatched Digital Elegance.*
 
 </div>
