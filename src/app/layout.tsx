@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable} ${ibmPlexMono.variable}`} suppressHydrationWarning>
       <body className={`${inter.className} min-h-screen flex flex-col antialiased text-foreground bg-background`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <SmoothScroll>
             <IntroAnimation />
             <Navbar />
