@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// 1. Categories
+model Category {
+  id         String    @id @default(uuid())
+  name       String
+  slug       String    @unique
+  sortOrder  Int       @default(0)
+  iconImage  String?
+  products   Product[]
+}
+
+// 2. Brands
+model Brand {
+  id         String    @id @default(uuid())
+  name       String
+  logoImage  String?
+  products   Product[]
+}
+
+// 3. Products
+model Product {
+  id             String    @id @default(uuid())
+  name           String
+  categoryId     String?
+  brandId        String?
+  price          Float
+  mrp            Float
+  stockQty       Int       @default(0)
+  description    String?
+  frameShape     String?
+  frameMaterial  String?
+  gender         String?
+  images         String    @default("[]") // JSON stringified array of URLs
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+
+  category       Category? @relation(fields: [categoryId], references: [id])
+  brand          Brand?    @relation(fields: [brandId], references: [id])
+}
+
+// 4. Banners
+model Banner {
+  id         String    @id @default(uuid())
+  title      String
+  subtitle   String?
+  image      String
+  linkUrl    String?
+  sortOrder  Int       @default(0)
+  isActive   Boolean   @default(true)
+}
+
+// 5. Bookings
+model Booking {
+  id          String    @id @default(uuid())
+  name        String
+  phone       String
+  email       String?
+  bookingDate String
+  timeSlot    String
+  status      String    @default("pending") // pending, confirmed, completed, cancelled
+  notes       String?
+  createdAt   DateTime  @default(now())
+}
+
+// 6. Discounts (Coupons/Campaigns)
+model Discount {
+  id            String    @id @default(uuid())
+  type          String    // product, campaign, coupon
+  title         String
+  percentOff    Float?
+  flatOff       Float?
+  couponCode    String?   @unique
+  minCartValue  Float?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+}
+
+// 7. Store Settings
+model StoreSetting {
+  id             String  @id @default(uuid())
+  address        String?
+  phone          String?
+  whatsappNumber String?
+  mapLat         Float?
+  mapLng         Float?
+  socialLinks    String? // JSON string
+}
+
+// 8. Site Content (Visual CMS)
+model SiteContent {
+  id        String   @id @default(uuid())
+  pageKey   String   // e.g., "home", "about", "contact"
+  sectionKey String  @unique // e.g., "home_hero_title", "about_banner_img"
+  textValue String?
+  imageValue String?
+  updatedAt DateTime @updatedAt
+}
+

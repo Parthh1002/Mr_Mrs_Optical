@@ -19,7 +19,11 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*":            ["./src/*"],
+      "@/components/*": ["./src/frontend/components/*"],
+      "@/hooks/*":      ["./src/frontend/hooks/*"],
+      "@/store/*":      ["./src/frontend/store/*"],
+      "@/lib/*":        ["./src/backend/lib/*"]
     }
   },
   "include": [
@@ -30,5 +34,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "scripts"]
 }

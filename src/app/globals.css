@@ -1,26 +1,494 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-heading: var(--font-serif);
+  --font-mono: var(--font-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-text: var(--text);
+  --color-text-dim: var(--text-dim);
+  --color-text-mute: var(--text-mute);
+  --color-brass: var(--brass);
+  --color-brass-dim: var(--brass-dim);
+  --color-copper: var(--copper);
+  --color-on-brass: var(--on-brass);
+
+  /* ── Marquee — GPU-accelerated translateX, pause-on-hover supported ── */
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 40s linear infinite;
+
+  @keyframes marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @keyframes marquee-reverse {
+    0%   { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+
+  /* ── Fade-up for section reveals ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Gold shimmer sweep ── */
+  @keyframes goldSweep {
+    from { background-position: -200% center; }
+    to   { background-position: 200% center; }
+  }
+
+  /* ── Soft pulse glow ── */
+  @keyframes softPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.04); }
+  }
+
+  /* ── Float for decorative elements ── */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-10px); }
+  }
+
+  --radius: 0.5rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ═══════════════════════════════════════════════════════════════
+   LENIS SMOOTH SCROLL — Required CSS
+   ═══════════════════════════════════════════════════════════════ */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN TOKENS
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* Default: Dark Theme (Optical Noir / Brass) */
+  --bg: #0D1512;
+  --bg-soft: #111C17;
+  --surface: #182620;
+  --surface-2: #1F2F27;
+  --line: rgba(244,239,227,.09);
+  --line-strong: rgba(244,239,227,.16);
+  --text: #F4EFE3;
+  --text-dim: #B7B0A0;
+  --text-mute: #847E6F;
+  --brass: #D0A64E;
+  --brass-dim: rgba(208,166,78,.14);
+  --copper: #C97C43;
+  --on-brass: #12160D;
+
+  /* Standard Tailwind color variables → Dark theme */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--brass);
+  --primary-foreground: var(--on-brass);
+  --secondary: var(--bg-soft);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-dim);
+  --accent: var(--brass);
+  --accent-foreground: var(--on-brass);
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  --border: var(--line);
+  --input: var(--line-strong);
+  --ring: var(--brass);
+
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--brass);
+  --sidebar-primary-foreground: var(--on-brass);
+  --sidebar-accent: var(--surface-2);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--brass);
+}
+
+.dark {
+  --bg: #0D1512;
+  --bg-soft: #111C17;
+  --surface: #182620;
+  --surface-2: #1F2F27;
+  --line: rgba(244,239,227,.09);
+  --line-strong: rgba(244,239,227,.16);
+  --text: #F4EFE3;
+  --text-dim: #B7B0A0;
+  --text-mute: #847E6F;
+  --brass: #D0A64E;
+  --brass-dim: rgba(208,166,78,.14);
+  --copper: #C97C43;
+  --on-brass: #12160D;
+
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--brass);
+  --primary-foreground: var(--on-brass);
+  --secondary: var(--bg-soft);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-dim);
+  --accent: var(--brass);
+  --accent-foreground: var(--on-brass);
+  --border: var(--line);
+  --input: var(--line-strong);
+  --ring: var(--brass);
+}
+
+.light {
+  --bg: #F2EEE2;
+  --bg-soft: #E9E3D2;
+  --surface: #FFFDF8;
+  --surface-2: #F6F0E1;
+  --line: rgba(20,26,20,.10);
+  --line-strong: rgba(20,26,20,.18);
+  --text: #171E19;
+  --text-dim: #4C554E;
+  --text-mute: #78725F;
+  --brass: #9C6E2D;
+  --brass-dim: rgba(156,110,45,.12);
+  --copper: #A2532A;
+  --on-brass: #FBF6EA;
+
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--brass);
+  --primary-foreground: var(--on-brass);
+  --secondary: var(--bg-soft);
+  --secondary-foreground: var(--text);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-dim);
+  --accent: var(--brass);
+  --accent-foreground: var(--on-brass);
+  --border: var(--line);
+  --input: var(--line-strong);
+  --ring: var(--brass);
+
+  --sidebar: var(--surface);
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--brass);
+  --sidebar-primary-foreground: var(--on-brass);
+  --sidebar-accent: var(--surface-2);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--brass);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BASE LAYER
+   ═══════════════════════════════════════════════════════════════ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply border-border outline-ring/50;
+    /* GPU layer hint for animated elements */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    @apply font-sans;
+    /* Prevent iOS tap highlight */
+    -webkit-tap-highlight-color: transparent;
+    /* Prevent font size inflate on orientation change */
+    -webkit-text-size-adjust: 100%;
+    /* Smooth native scroll fallback (when Lenis is disabled) */
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* Buttery transition when theme toggles */
+    transition: background-color 0.35s ease, color 0.35s ease;
+    /* Prevent horizontal overflow on mobile */
+    overflow-x: hidden;
+    /* Mobile bottom bar safe area */
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Safe viewport height — avoids mobile browser chrome cutoff */
+  .h-screen-safe {
+    height: 100vh;
+    height: 100svh; /* svh = small viewport height → works on iOS/Android chrome */
+  }
+  .min-h-screen-safe {
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+  }
+
+  /* Accessible focus ring */
+  :focus-visible {
+    outline: 2px solid var(--brass);
+    outline-offset: 3px;
+    border-radius: 4px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ═══════════════════════════════════════════════════════════════
+   GPU-ACCELERATED ANIMATION UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Force GPU composite layer — use on elements that animate */
+.gpu {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Remove GPU hint after animation — add via JS */
+.gpu-done {
+  will-change: auto;
+  transform: none;
+  backface-visibility: visible;
+}
+
+/* Smooth image zoom without layout paint */
+.img-zoom {
+  overflow: hidden;
+}
+.img-zoom img {
+  transition: transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+.img-zoom:hover img {
+  transform: scale(1.07);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GLASSMORPHISM UTILITY
+   ═══════════════════════════════════════════════════════════════ */
+.glass {
+  background: rgba(24, 38, 32, 0.55);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid rgba(244, 239, 227, 0.1);
+}
+.glass-light {
+  background: rgba(255, 253, 248, 0.6);
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid rgba(20, 26, 20, 0.1);
+}
+
+
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLL-REVEAL — fade-up utility for GSAP-less fallback
+   ═══════════════════════════════════════════════════════════════ */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BUTTON — Brass Sweep Light Effect
+   ═══════════════════════════════════════════════════════════════ */
+.btn-brass-sweep {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.25s ease;
+}
+.btn-brass-sweep:active {
+  transform: scale(0.97);
+}
+.btn-brass-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -160%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(244, 239, 227, 0.28),
+    transparent
+  );
+  transform: skewX(-22deg);
+  pointer-events: none;
+  transition: none;
+}
+.btn-brass-sweep:hover::after {
+  left: 160%;
+  transition: left 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MARQUEE — Smooth infinite scroll (GPU) + pause on hover
+   ═══════════════════════════════════════════════════════════════ */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+  will-change: transform;
+}
+.marquee-group:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CARD HOVER — premium lift effect
+   ═══════════════════════════════════════════════════════════════ */
+.card-lift {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.4s ease;
+}
+.card-lift:hover {
+  transform: translateY(-8px) scale(1.012);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(208,166,78,0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GOLD SHIMMER TEXT
+   ═══════════════════════════════════════════════════════════════ */
+.text-gold-shimmer {
+  background: linear-gradient(
+    110deg,
+    var(--brass) 0%,
+    #f5d48e 40%,
+    var(--brass) 60%,
+    #b8822a 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldSweep 4s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE FIXES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Fix: iOS rubber-band scroll when modal/overlay is open */
+body.overlay-open {
+  position: fixed;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Safe horizontal container on small screens */
+.container {
+  max-width: 100%;
+}
+
+/* Touch-action on swipeable elements */
+.swipeable {
+  touch-action: pan-y;
+}
+
+/* Images never overflow their container */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   REDUCED MOTION — respect user accessibility preference
+   ═══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .marquee-track {
+    animation: none !important;
+  }
+
+  .btn-brass-sweep::after {
+    display: none;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
