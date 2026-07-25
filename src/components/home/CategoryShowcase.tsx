@@ -124,8 +124,8 @@ function CategoryCard({
           {cat.name}
         </h4>
 
-        {/* Subtitle + arrow — hidden until hover */}
-        <div className="mt-2 flex items-center justify-between opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-400 delay-50">
+        {/* Subtitle + arrow — always visible on touch/mobile, hover slide-up on desktop */}
+        <div className="mt-2 flex items-center justify-between max-sm:opacity-100 max-sm:translate-y-0 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-400 delay-50">
           <span className="text-white/70 text-sm font-light">{cat.sub}</span>
           <div className="flex items-center gap-1.5 text-primary text-xs font-semibold uppercase tracking-wider">
             Explore <ArrowUpRight size={13} />
