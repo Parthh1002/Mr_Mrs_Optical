@@ -241,10 +241,10 @@ export default function Navbar() {
                 )}
               </button>
 
-              {/* 3. WISHLIST BUTTON */}
+              {/* 3. WISHLIST BUTTON (desktop & tablet) */}
               <button
                 onClick={() => setIsWishlistOpen(true)}
-                className="p-2.5 rounded-full hover:bg-primary/10 text-foreground hover:text-primary transition-all duration-200 cursor-pointer relative"
+                className="hidden sm:flex p-2.5 rounded-full hover:bg-primary/10 text-foreground hover:text-primary transition-all duration-200 cursor-pointer relative"
                 aria-label="Wishlist"
                 title="Wishlist Favorites"
               >
@@ -256,10 +256,10 @@ export default function Navbar() {
                 )}
               </button>
 
-              {/* 4. PHONE / QUICK CONTACT BUTTON */}
+              {/* 4. PHONE / QUICK CONTACT BUTTON (desktop & tablet) */}
               <button
                 onClick={() => setIsContactOpen(true)}
-                className="p-2.5 rounded-full hover:bg-primary/10 text-foreground hover:text-primary transition-all duration-200 cursor-pointer relative"
+                className="hidden sm:flex p-2.5 rounded-full hover:bg-primary/10 text-foreground hover:text-primary transition-all duration-200 cursor-pointer relative"
                 aria-label="Contact Concierge"
                 title="Store Concierge & Call"
               >
@@ -284,13 +284,23 @@ export default function Navbar() {
                 </Button>
               </div>
 
-              {/* Mobile Hamburger */}
+              {/* Highly Prominent Mobile MENU Button */}
               <button
-                className="lg:hidden p-2 rounded-lg hover:bg-primary/10 transition-colors duration-200"
+                className="lg:hidden ml-1 px-3 py-2 rounded-2xl bg-primary text-primary-foreground font-bold text-xs flex items-center gap-1.5 shadow-md hover:bg-primary/90 transition-all cursor-pointer border-none"
                 onClick={() => setIsMobileMenuOpen(v => !v)}
-                aria-label="Toggle menu"
+                aria-label="Toggle Navigation Menu"
               >
-                {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+                {isMobileMenuOpen ? (
+                  <>
+                    <X size={18} />
+                    <span className="font-mono text-[11px] uppercase tracking-wider">CLOSE</span>
+                  </>
+                ) : (
+                  <>
+                    <Menu size={18} />
+                    <span className="font-mono text-[11px] uppercase tracking-wider">MENU</span>
+                  </>
+                )}
               </button>
             </div>
 
