@@ -2,25 +2,20 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, ArrowRight, Clock } from 'lucide-react';
-
-// Inline SVGs for social icons not available in this lucide-react version
-const InstagramIcon = ({ size = 17 }: { size?: number }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>);
-const FacebookIcon  = ({ size = 17 }: { size?: number }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>);
-const YoutubeIcon   = ({ size = 17 }: { size?: number }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>);
-
+import { MapPin, Phone, Mail, ArrowRight, Clock, Sparkles, Send } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
 import { usePathname } from 'next/navigation';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] as any },
-  }),
-};
+// Social SVGs
+const InstagramIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+);
+const FacebookIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+);
+const YoutubeIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+);
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
@@ -41,8 +36,8 @@ const SERVICE_LINKS = [
 
 const SOCIALS = [
   { icon: InstagramIcon, href: '#', label: 'Instagram' },
-  { icon: FacebookIcon,  href: '#', label: 'Facebook'  },
-  { icon: YoutubeIcon,   href: '#', label: 'YouTube'   },
+  { icon: FacebookIcon, href: '#', label: 'Facebook' },
+  { icon: YoutubeIcon, href: '#', label: 'YouTube' },
 ];
 
 export default function Footer() {
@@ -60,250 +55,169 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative overflow-hidden bg-[#0D1512] text-[#F4EFE3]">
+    <footer className="relative overflow-hidden bg-[#0B120F] text-[#F4EFE3] pt-12 pb-6 border-t border-[#D0A64E]/20">
+      {/* Ambient background glow */}
+      <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[radial-gradient(circle,rgba(208,166,78,0.06),transparent_70%)]" />
 
-      {/* ── top accent line ─────────────────────────────────────── */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-[#D0A64E]/60 to-transparent" />
-
-      {/* ── giant watermark ─────────────────────────────────────── */}
-      <span
-        aria-hidden
-        className="pointer-events-none select-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-                   text-[22vw] font-bold font-[family-name:var(--font-serif)] whitespace-nowrap
-                   text-[#D0A64E]/[0.035] leading-none tracking-tighter"
-      >
-        MR &amp; MRS
-      </span>
-
-      {/* ── radial glow ─────────────────────────────────────────── */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-32 left-1/4 w-[560px] h-[560px] rounded-full
-                   bg-[radial-gradient(circle,rgba(208,166,78,0.07),transparent_70%)]"
-      />
-
-      <div className="container relative z-10 mx-auto px-6 md:px-12 pt-20 pb-0">
-
-        {/* ── NEWSLETTER BANNER ────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mb-20 rounded-2xl border border-[#D0A64E]/20 bg-[#111C17]
-                     px-8 py-10 md:px-14 md:py-12 overflow-hidden"
-        >
-          {/* subtle corner ornament */}
-          <div className="absolute top-0 right-0 w-64 h-64 rounded-full
-                          bg-[radial-gradient(circle,rgba(208,166,78,0.08),transparent_70%)]
-                          translate-x-1/4 -translate-y-1/4" />
-
-          <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-            <div className="max-w-md">
-              <p className="font-mono text-xs tracking-[0.25em] text-[#D0A64E] uppercase mb-3">
-                Stay In The Loop
-              </p>
-              <h3 className="font-[family-name:var(--font-serif)] text-2xl md:text-3xl font-medium leading-snug">
-                Premium Eyewear, <span className="text-[#D0A64E]">Delivered to Your Inbox</span>
-              </h3>
-            </div>
-
-            {subscribed ? (
-              <div className="flex items-center gap-3 bg-[#D0A64E]/10 border border-[#D0A64E]/30 rounded-xl px-6 py-4">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-sm text-[#F4EFE3]/80">You're subscribed! Thank you.</span>
-              </div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="flex w-full md:w-auto gap-0 min-w-0 md:min-w-[380px]">
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="Enter your email address"
-                  className="flex-1 min-w-0 rounded-l-xl border border-[#D0A64E]/25 bg-[#0D1512]/60
-                             px-5 py-3.5 text-sm text-[#F4EFE3] placeholder:text-[#847E6F]
-                             outline-none focus:border-[#D0A64E]/60 transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="shrink-0 flex items-center gap-2 rounded-r-xl bg-[#D0A64E] hover:bg-[#C4993E]
-                             px-6 py-3.5 text-[#12160D] text-sm font-bold tracking-wider
-                             transition-colors duration-200 cursor-pointer"
-                >
-                  Subscribe <ArrowRight size={16} />
-                </button>
-              </form>
-            )}
-          </div>
-        </motion.div>
-
-        {/* ── MAIN GRID ────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
-
-          {/* Brand col */}
-          <motion.div
-            custom={0} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
-            className="lg:col-span-4 space-y-7"
-          >
+      <div className="container relative z-10 mx-auto px-6 md:px-12">
+        {/* Main 3-Column Footer Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 pb-10 border-b border-[#F4EFE3]/10">
+          
+          {/* LEFT COLUMN: Brand & Identity */}
+          <div className="lg:col-span-4 space-y-4">
             <Link href="/" className="inline-block">
               <Logo className="text-[#F4EFE3]" variant="stacked" />
             </Link>
 
-            <p className="text-[#B7B0A0] text-sm leading-relaxed max-w-xs">
-              Elevating your vision with precision-crafted frames and India's finest clinical eye care.
-              See the world with elegance.
+            <p className="text-[#B7B0A0] text-xs sm:text-sm leading-relaxed max-w-sm">
+              Elevating your vision with precision-crafted frames and India's finest clinical eye care. See the world with elegance.
             </p>
 
-            {/* Socials */}
-            <div className="flex items-center gap-3 pt-1">
+            {/* Social Icons */}
+            <div className="flex items-center gap-2.5 pt-1">
               {SOCIALS.map(({ icon: Icon, href, label }) => (
                 <a
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl
-                             border border-[#D0A64E]/20 text-[#D0A64E]
-                             hover:bg-[#D0A64E]/10 hover:border-[#D0A64E]/50
-                             transition-all duration-200"
+                  className="w-9 h-[#36px] flex items-center justify-center rounded-lg border border-[#D0A64E]/25 text-[#D0A64E] hover:bg-[#D0A64E] hover:text-[#0B120F] transition-all duration-200"
                 >
-                  <Icon size={17} />
+                  <Icon size={16} />
                 </a>
               ))}
             </div>
 
-            {/* Hours badge */}
-            <div className="flex items-start gap-3 bg-[#182620] border border-[#D0A64E]/15 rounded-xl px-4 py-4">
-              <Clock size={16} className="text-[#D0A64E] shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-mono tracking-widest text-[#D0A64E] uppercase mb-1.5">Store Hours</p>
-                <p className="text-[#B7B0A0] text-xs leading-relaxed">
-                  Mon – Sat: 10:00 AM – 8:00 PM<br />
-                  Sunday: 11:00 AM – 6:00 PM
-                </p>
+            {/* Visit Us Contact Info */}
+            <div className="space-y-2 pt-2 text-xs text-[#B7B0A0]">
+              <div className="flex items-center gap-2">
+                <MapPin size={14} className="text-[#D0A64E] shrink-0" />
+                <span>Shop No. 1, Ground Floor, Near City Mall, Surat, Gujarat</span>
+              </div>
+              <div className="flex items-center gap-4 flex-wrap">
+                <a href="tel:+919876543210" className="flex items-center gap-1.5 hover:text-[#F4EFE3] transition-colors">
+                  <Phone size={13} className="text-[#D0A64E]" />
+                  <span>+91 98765 43210</span>
+                </a>
+                <a href="mailto:hello@mrmrsoptical.com" className="flex items-center gap-1.5 hover:text-[#F4EFE3] transition-colors">
+                  <Mail size={13} className="text-[#D0A64E]" />
+                  <span>hello@mrmrsoptical.com</span>
+                </a>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Discover links */}
-          <motion.div
-            custom={1} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
-            className="lg:col-span-2 lg:col-start-6 space-y-6"
-          >
-            <h4 className="font-mono text-xs tracking-[0.22em] uppercase text-[#D0A64E]">Discover</h4>
-            <ul className="space-y-4">
-              {NAV_LINKS.map(({ label, href }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    className="group flex items-center gap-2 text-sm text-[#B7B0A0] hover:text-[#F4EFE3] transition-colors"
+          {/* MIDDLE COLUMN: Store Hours & Newsletter */}
+          <div className="lg:col-span-4 space-y-4 flex flex-col justify-between">
+            {/* Store Hours Card */}
+            <div className="bg-[#14201A] border border-[#D0A64E]/20 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="p-2 rounded-lg bg-[#D0A64E]/10 text-[#D0A64E]">
+                  <Clock size={16} />
+                </div>
+                <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-[#D0A64E] font-bold">
+                  Store Hours
+                </h4>
+              </div>
+              <div className="space-y-1.5 text-xs text-[#F4EFE3] font-medium">
+                <div className="flex justify-between items-center py-1 border-b border-[#F4EFE3]/5">
+                  <span className="text-[#B7B0A0]">Mon – Sat:</span>
+                  <span className="font-semibold text-[#D0A64E]">10:00 AM – 8:00 PM</span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-[#B7B0A0]">Sunday:</span>
+                  <span className="font-semibold text-[#D0A64E]">11:00 AM – 6:00 PM</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Newsletter Subscription */}
+            <div className="bg-[#14201A] border border-[#D0A64E]/15 rounded-2xl p-4 sm:p-5">
+              <p className="font-mono text-[10px] tracking-[0.2em] text-[#D0A64E] uppercase mb-1 flex items-center gap-1.5 font-semibold">
+                <Sparkles size={11} /> Stay In The Loop
+              </p>
+              <h5 className="text-xs font-semibold text-[#F4EFE3] mb-3">
+                Premium Eyewear, <span className="text-[#D0A64E]">Delivered to Your Inbox</span>
+              </h5>
+
+              {subscribed ? (
+                <div className="text-xs text-emerald-400 font-medium py-2 px-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  ✓ You're subscribed! Thank you.
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="flex gap-2">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="flex-1 min-w-0 rounded-xl border border-[#D0A64E]/20 bg-[#0B120F] px-3.5 py-2 text-xs text-[#F4EFE3] placeholder:text-[#847E6F] outline-none focus:border-[#D0A64E]"
+                  />
+                  <button
+                    type="submit"
+                    className="shrink-0 flex items-center justify-center rounded-xl bg-[#D0A64E] hover:bg-[#C4993E] px-4 py-2 text-[#0B120F] text-xs font-bold transition-all cursor-pointer"
                   >
-                    <span className="w-0 h-px bg-[#D0A64E] transition-all duration-300 group-hover:w-4" />
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+                    <Send size={14} />
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
 
-          {/* Services links */}
-          <motion.div
-            custom={2} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
-            className="lg:col-span-3 space-y-6"
-          >
-            <h4 className="font-mono text-xs tracking-[0.22em] uppercase text-[#D0A64E]">Services</h4>
-            <ul className="space-y-4">
-              {SERVICE_LINKS.map(({ label, href }) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    className="group flex items-center gap-2 text-sm text-[#B7B0A0] hover:text-[#F4EFE3] transition-colors"
-                  >
-                    <span className="w-0 h-px bg-[#D0A64E] transition-all duration-300 group-hover:w-4" />
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+          {/* RIGHT COLUMN: Discover & Services Navigation */}
+          <div className="lg:col-span-4 grid grid-cols-2 gap-6">
+            {/* Discover */}
+            <div>
+              <h4 className="font-mono text-xs tracking-[0.2em] uppercase text-[#D0A64E] font-bold mb-4">
+                Discover
+              </h4>
+              <ul className="space-y-2.5">
+                {NAV_LINKS.map(({ label, href }) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      className="text-xs text-[#B7B0A0] hover:text-[#D0A64E] transition-colors inline-block hover:translate-x-1 transform duration-200"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          {/* Contact col */}
-          <motion.div
-            custom={3} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
-            className="lg:col-span-3 space-y-6"
-          >
-            <h4 className="font-mono text-xs tracking-[0.22em] uppercase text-[#D0A64E]">Visit Us</h4>
-            <ul className="space-y-5">
-              <li>
-                <a
-                  href="https://maps.google.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start gap-3.5 group"
-                >
-                  <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#D0A64E]/10 text-[#D0A64E] shrink-0 group-hover:bg-[#D0A64E]/20 transition-colors">
-                    <MapPin size={15} />
-                  </span>
-                  <span className="text-sm text-[#B7B0A0] group-hover:text-[#F4EFE3] transition-colors leading-relaxed">
-                    Shop No. 1, Ground Floor,<br />
-                    Near City Mall, Surat, Gujarat
-                  </span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="tel:+919876543210"
-                  className="flex items-center gap-3.5 group"
-                >
-                  <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#D0A64E]/10 text-[#D0A64E] shrink-0 group-hover:bg-[#D0A64E]/20 transition-colors">
-                    <Phone size={15} />
-                  </span>
-                  <span className="text-sm text-[#B7B0A0] group-hover:text-[#F4EFE3] transition-colors">
-                    +91 98765 43210
-                  </span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="mailto:hello@mrmrsoptical.com"
-                  className="flex items-center gap-3.5 group"
-                >
-                  <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#D0A64E]/10 text-[#D0A64E] shrink-0 group-hover:bg-[#D0A64E]/20 transition-colors">
-                    <Mail size={15} />
-                  </span>
-                  <span className="text-sm text-[#B7B0A0] group-hover:text-[#F4EFE3] transition-colors">
-                    hello@mrmrsoptical.com
-                  </span>
-                </a>
-              </li>
-            </ul>
-
-            {/* CTA */}
-            <Link
-              href="/book"
-              className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#D0A64E] hover:bg-[#C4993E]
-                         px-5 py-3 text-[#12160D] text-sm font-bold tracking-wider transition-colors duration-200"
-            >
-              Book Eye Test <ArrowRight size={15} />
-            </Link>
-          </motion.div>
+            {/* Services */}
+            <div>
+              <h4 className="font-mono text-xs tracking-[0.2em] uppercase text-[#D0A64E] font-bold mb-4">
+                Services
+              </h4>
+              <ul className="space-y-2.5">
+                {SERVICE_LINKS.map(({ label, href }) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      className="text-xs text-[#B7B0A0] hover:text-[#D0A64E] transition-colors leading-snug inline-block hover:translate-x-1 transform duration-200"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
 
         </div>
 
-        {/* ── BOTTOM BAR ───────────────────────────────────────── */}
-        <div className="border-t border-[#F4EFE3]/[0.08] py-7 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[#847E6F] text-xs font-mono tracking-wider">
-            © {new Date().getFullYear()} Mr &amp; Mrs Optical — All rights reserved.
-          </p>
-          <div className="flex items-center gap-6 text-xs text-[#847E6F] font-mono tracking-wider">
-            <Link href="/privacy" className="hover:text-[#F4EFE3] transition-colors">Privacy Policy</Link>
-            <span className="text-[#D0A64E]/40">·</span>
-            <Link href="/terms" className="hover:text-[#F4EFE3] transition-colors">Terms of Service</Link>
-            <span className="text-[#D0A64E]/40">·</span>
-            <Link href="/sitemap" className="hover:text-[#F4EFE3] transition-colors">Sitemap</Link>
+        {/* BOTTOM COPYRIGHT BAR */}
+        <div className="pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-[11px] text-[#847E6F] font-mono">
+          <p>© {new Date().getFullYear()} Mr &amp; Mrs Optical. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <Link href="/privacy" className="hover:text-[#D0A64E] transition-colors">Privacy Policy</Link>
+            <span>·</span>
+            <Link href="/terms" className="hover:text-[#D0A64E] transition-colors">Terms of Service</Link>
+            <span>·</span>
+            <Link href="/sitemap" className="hover:text-[#D0A64E] transition-colors">Sitemap</Link>
           </div>
         </div>
-
       </div>
     </footer>
   );
