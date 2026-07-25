@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Heart, Phone, ChevronDown, Menu, X,
-  ArrowRight, ShoppingBag, ShieldCheck,
+  ArrowRight, ShoppingBag, ShieldCheck, Plus, Minus, Trash2, MapPin, MessageSquare, ExternalLink, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/ui/Logo';
@@ -14,22 +14,50 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useBookingModal } from '@/store/bookingModalStore';
 import { usePathname } from 'next/navigation';
 
-export default function Navbar() {
-  const pathname         = usePathname();
-  const [isScrolled,     setIsScrolled]      = useState(false);
-  const [wishlistCount,  setWishlistCount]   = useState(0);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeMegaMenu, setActiveMegaMenu]  = useState<string | null>(null);
-  const [mounted,        setMounted]         = useState(false);
+// Sample products for live instant search
+const SEARCH_PRODUCTS = [
+  { id: 'prod-1', name: 'Classic Gold Aviator', category: 'men', price: 4999, mrp: 6999, brand: 'Ray-Ban', image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=300&auto=format&fit=crop' },
+  { id: 'prod-2', name: 'Vintage Cat-Eye Gold', category: 'women', price: 5499, mrp: 7999, brand: 'Gucci', image: 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=300&auto=format&fit=crop' },
+  { id: 'prod-3', name: 'Pro Blue-Cut Matte Black', category: 'computer', price: 2499, mrp: 3499, brand: 'Oakley', image: 'https://images.unsplash.com/photo-1509695507497-903c140c43b0?w=300&auto=format&fit=crop' },
+  { id: 'prod-4', name: 'Kids Flexible Round', category: 'kids', price: 1999, mrp: 2999, brand: 'Persol', image: 'https://images.unsplash.com/photo-1533036666993-41bb62afbb0e?w=300&auto=format&fit=crop' },
+  { id: 'prod-5', name: 'Acuvue Moist Daily Lenses', category: 'lenses', price: 1499, mrp: 1999, brand: 'Acuvue', image: 'https://images.unsplash.com/photo-1573511860302-28c5243198e5?w=300&auto=format&fit=crop' },
+  { id: 'prod-6', name: 'Clubmaster Brass Classic', category: 'men', price: 5999, mrp: 8499, brand: 'Tom Ford', image: 'https://images.unsplash.com/photo-1508296695146-257a814070b4?w=300&auto=format&fit=crop' },
+  { id: 'prod-7', name: 'Geometric Oversized Pearl', category: 'women', price: 6499, mrp: 9999, brand: 'Prada', image: 'https://images.unsplash.com/photo-1473496169904-658ba7574b0d?w=300&auto=format&fit=crop' },
+  { id: 'prod-8', name: 'Titanium Rimless Rectangular', category: 'computer', price: 3999, mrp: 5499, brand: 'Oliver Peoples', image: 'https://images.unsplash.com/photo-1577215951806-03f6f1c48c8b?w=300&auto=format&fit=crop' }
+];
 
-  const cartCount        = useCartStore(s => s.getCartCount());
+export default function Navbar() {
+  const pathname = usePathname();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [wishlistItems, setWishlistItems] = useState<any[]>([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // 4 Interactive Modals/Drawers State
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+
+  // Search State
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Cart store
+  const { items: cartItems, removeItem, updateQuantity, getCartTotal, getCartCount, addItem } = useCartStore();
   const openBookingModal = useBookingModal(s => s.open);
 
   const updateWishlist = useCallback(() => {
     try {
       const saved = localStorage.getItem('mrandmrs_wishlist');
-      setWishlistCount(saved ? JSON.parse(saved).length : 0);
-    } catch { /* ignore */ }
+      const items = saved ? JSON.parse(saved) : [];
+      setWishlistItems(items);
+      setWishlistCount(items.length);
+    } catch {
+      setWishlistItems([]);
+      setWishlistCount(0);
+    }
   }, []);
 
   useEffect(() => {
@@ -45,6 +73,18 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Keyboard shortcut Ctrl/Cmd + K for Search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   useEffect(() => {
     const onResize = () => { if (window.innerWidth >= 1024) setIsMobileMenuOpen(false); };
     window.addEventListener('resize', onResize);
@@ -52,45 +92,30 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (isMobileMenuOpen) {
+    if (isMobileMenuOpen || isSearchOpen || isCartOpen || isWishlistOpen || isContactOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
-  }, [isMobileMenuOpen]);
+  }, [isMobileMenuOpen, isSearchOpen, isCartOpen, isWishlistOpen, isContactOpen]);
 
   if (pathname?.startsWith('/admin')) return null;
 
-  const megaMenus = {
-    collections: {
-      title: 'Premium Collections',
-      items: [
-        { name: 'Luxury Men',          href: '/catalog?category=men' },
-        { name: 'Luxury Women',        href: '/catalog?category=women' },
-        { name: 'Computer Glasses',    href: '/catalog?category=computer' },
-        { name: 'Designer Sunglasses', href: '/catalog?category=sunglasses' },
-      ],
-      featuredImage: '/generated/frames-display.jpg',
-    },
-    services: {
-      title: 'Our Services',
-      items: [
-        { name: 'Computerized Eye Test', href: '/services#eye-test' },
-        { name: 'Contact Lens Fitting',  href: '/services#contact-lens' },
-        { name: 'Frame Styling',         href: '/services#styling' },
-        { name: 'Lens Replacement',      href: '/services#lens' },
-      ],
-      featuredImage: '/generated/eye-test.jpg',
-    },
-  };
+  const filteredSearchProducts = searchQuery.trim() === ''
+    ? SEARCH_PRODUCTS.slice(0, 4)
+    : SEARCH_PRODUCTS.filter(p =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
 
   const navLinkCls =
     'text-sm font-medium uppercase tracking-widest transition-colors duration-200 relative group hover:text-primary';
 
   return (
     <>
-      {/* ── Main Navbar ──────────────────────────────────────────── */}
+      {/* ── Main Navbar Header ───────────────────────────────────── */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
@@ -107,7 +132,7 @@ export default function Navbar() {
               <Logo />
             </Link>
 
-            {/* Desktop Nav */}
+            {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8 absolute left-1/2 -translate-x-1/2">
               <Link href="/" className={navLinkCls}>
                 Home
@@ -144,146 +169,492 @@ export default function Navbar() {
               </Link>
             </nav>
 
-            {/* Desktop Actions */}
-            <div className="hidden lg:flex items-center space-x-4 z-50">
-              <ThemeToggle />
+            {/* Header Actions (4 Functional Buttons) */}
+            <div className="flex items-center space-x-2 sm:space-x-3.5 z-50">
+              <div className="hidden sm:block">
+                <ThemeToggle />
+              </div>
 
-              <button className="hover:text-primary transition-colors duration-200 cursor-pointer" aria-label="Search">
-                <Search size={18} strokeWidth={1.6} />
+              {/* 1. SEARCH BUTTON */}
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="p-2.5 rounded-full hover:bg-primary/10 text-foreground hover:text-primary transition-all duration-200 cursor-pointer relative"
+                aria-label="Search Catalog"
+                title="Search (Ctrl + K)"
+              >
+                <Search size={19} strokeWidth={1.8} />
               </button>
 
-              <Link href="/cart" className="hover:text-primary transition-colors duration-200 relative" aria-label="Cart">
-                <ShoppingBag size={18} strokeWidth={1.6} />
-                {mounted && cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                    {cartCount}
+              {/* 2. SHOPPING BAG (CART) BUTTON */}
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="p-2.5 rounded-full hover:bg-primary/10 text-foreground hover:text-primary transition-all duration-200 cursor-pointer relative"
+                aria-label="Shopping Cart"
+                title="Shopping Cart"
+              >
+                <ShoppingBag size={19} strokeWidth={1.8} />
+                {mounted && getCartCount() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-md animate-pulse">
+                    {getCartCount()}
                   </span>
                 )}
-              </Link>
+              </button>
 
-              <Link href="/wishlist" className="hover:text-primary transition-colors duration-200 relative" aria-label="Wishlist">
-                <Heart size={18} strokeWidth={1.6} />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              {/* 3. WISHLIST BUTTON */}
+              <button
+                onClick={() => setIsWishlistOpen(true)}
+                className="p-2.5 rounded-full hover:bg-primary/10 text-foreground hover:text-primary transition-all duration-200 cursor-pointer relative"
+                aria-label="Wishlist"
+                title="Wishlist Favorites"
+              >
+                <Heart size={19} strokeWidth={1.8} />
+                {mounted && wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-copper text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-md">
                     {wishlistCount}
                   </span>
                 )}
-              </Link>
+              </button>
 
-              <a href="tel:+919876543210" className="hover:text-primary transition-colors duration-200" aria-label="Call us">
-                <Phone size={16} strokeWidth={1.6} />
-              </a>
-
-              <Link
-                href="/admin"
-                className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary border border-primary/40 hover:border-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all duration-200"
+              {/* 4. PHONE / QUICK CONTACT BUTTON */}
+              <button
+                onClick={() => setIsContactOpen(true)}
+                className="p-2.5 rounded-full hover:bg-primary/10 text-foreground hover:text-primary transition-all duration-200 cursor-pointer relative"
+                aria-label="Contact Concierge"
+                title="Store Concierge & Call"
               >
-                <ShieldCheck size={14} />
-                Admin
-              </Link>
+                <Phone size={18} strokeWidth={1.8} className="hover:animate-bounce" />
+              </button>
 
-              <Button
-                onClick={openBookingModal}
-                className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider text-xs px-5 py-[10px] transition-all duration-200 border-none cursor-pointer btn-brass-sweep"
+              {/* Admin & Book Button */}
+              <div className="hidden lg:flex items-center space-x-3 ml-2">
+                <Link
+                  href="/admin"
+                  className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-primary border border-primary/40 hover:border-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all duration-200"
+                >
+                  <ShieldCheck size={14} />
+                  Admin
+                </Link>
+
+                <Button
+                  onClick={openBookingModal}
+                  className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold uppercase tracking-wider text-xs px-5 py-[10px] transition-all duration-200 border-none cursor-pointer btn-brass-sweep"
+                >
+                  Book Eye Test
+                </Button>
+              </div>
+
+              {/* Mobile Hamburger */}
+              <button
+                className="lg:hidden p-2 rounded-lg hover:bg-primary/10 transition-colors duration-200"
+                onClick={() => setIsMobileMenuOpen(v => !v)}
+                aria-label="Toggle menu"
               >
-                Book Eye Test
-              </Button>
+                {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
             </div>
 
-            {/* Mobile Hamburger */}
-            <button
-              className="lg:hidden z-50 p-2 rounded-lg hover:bg-primary/10 transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(v => !v)}
-              aria-label="Toggle menu"
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {isMobileMenuOpen ? (
-                  <motion.span
-                    key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.18 }}
-                  >
-                    <X size={22} />
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="open"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.18 }}
-                  >
-                    <Menu size={22} />
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </button>
           </div>
         </div>
-
-        {/* ── Desktop Mega Menu ─────────────────────────────────── */}
-        <AnimatePresence>
-          {activeMegaMenu && (
-            <motion.div
-              key={activeMegaMenu}
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute top-full left-0 right-0 bg-background/97 backdrop-blur-xl shadow-2xl border-t border-border text-foreground"
-              onMouseLeave={() => setActiveMegaMenu(null)}
-            >
-              <div className="container mx-auto px-12 py-10">
-                <div className="grid grid-cols-3 gap-12">
-                  <div className="col-span-1">
-                    <h3 className="text-2xl font-[family-name:var(--font-serif)] text-primary mb-5">
-                      {megaMenus[activeMegaMenu as keyof typeof megaMenus].title}
-                    </h3>
-                    <ul className="space-y-4">
-                      {megaMenus[activeMegaMenu as keyof typeof megaMenus].items.map((item, idx) => (
-                        <motion.li
-                          key={item.href}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.25, delay: idx * 0.06 }}
-                        >
-                          <Link
-                            href={item.href}
-                            onClick={() => setActiveMegaMenu(null)}
-                            className="text-muted-foreground hover:text-primary transition-all duration-200 hover:translate-x-1 inline-block"
-                          >
-                            {item.name}
-                          </Link>
-                        </motion.li>
-                      ))}
-                    </ul>
-                    <Link
-                      href={activeMegaMenu === 'collections' ? '/catalog' : '/services'}
-                      onClick={() => setActiveMegaMenu(null)}
-                    >
-                      <Button variant="link" className="mt-5 px-0 text-primary font-semibold uppercase tracking-widest gap-2 text-xs">
-                        View All <ArrowRight size={13} />
-                      </Button>
-                    </Link>
-                  </div>
-                  <div className="col-span-2 relative h-56 rounded-2xl overflow-hidden">
-                    <img
-                      src={megaMenus[activeMegaMenu as keyof typeof megaMenus].featuredImage}
-                      alt="Featured"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/20" />
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </header>
 
-      {/* ── Mobile Menu Panel ─────────────────────────────────────── */}
+      {/* ── MODAL 1: INSTANT LIVE SEARCH MODAL (Cmd + K) ─────────── */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSearchOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="fixed top-12 sm:top-20 left-1/2 -translate-x-1/2 w-[92vw] max-w-2xl bg-card border border-primary/30 rounded-3xl p-5 sm:p-6 shadow-2xl z-[61] overflow-hidden"
+            >
+              {/* Search Bar Input */}
+              <div className="relative flex items-center mb-4 pb-4 border-b border-line">
+                <Search size={22} className="text-primary mr-3 shrink-0" />
+                <input
+                  type="text"
+                  autoFocus
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search frames, aviators, blue-cut, brands..."
+                  className="w-full bg-transparent text-base sm:text-lg text-foreground placeholder:text-muted-foreground outline-none font-medium"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="p-1 text-muted-foreground hover:text-foreground">
+                    <X size={16} />
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsSearchOpen(false)}
+                  className="ml-3 p-1.5 rounded-full bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Quick Suggestion Tags */}
+              <div className="mb-4">
+                <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1">
+                  <Sparkles size={12} className="text-primary" /> Popular Searches
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {['Aviator', 'Blue-Cut', 'Ray-Ban', 'Gucci', 'Titanium', 'Cat-Eye'].map(tag => (
+                    <button
+                      key={tag}
+                      onClick={() => setSearchQuery(tag)}
+                      className="px-3 py-1 rounded-full bg-secondary/80 hover:bg-primary/20 hover:text-primary text-xs font-medium text-foreground transition-colors cursor-pointer border border-line"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Instant Search Results */}
+              <div className="space-y-2 max-h-[55vh] overflow-y-auto pr-1">
+                <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
+                  Catalog Results ({filteredSearchProducts.length})
+                </p>
+
+                {filteredSearchProducts.length > 0 ? (
+                  filteredSearchProducts.map(prod => (
+                    <Link
+                      key={prod.id}
+                      href={`/catalog?search=${encodeURIComponent(prod.name)}`}
+                      onClick={() => setIsSearchOpen(false)}
+                      className="flex items-center gap-4 p-3 rounded-2xl bg-secondary/30 hover:bg-primary/10 border border-transparent hover:border-primary/20 transition-all group"
+                    >
+                      <img src={prod.image} alt={prod.name} className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-primary font-mono block">{prod.brand}</span>
+                        <h5 className="text-sm font-bold text-foreground font-serif truncate group-hover:text-primary transition-colors">{prod.name}</h5>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm font-bold text-foreground">₹{prod.price.toLocaleString()}</span>
+                        <span className="text-xs text-muted-foreground line-through block text-[11px]">₹{prod.mrp.toLocaleString()}</span>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-6">No matching frames found for "{searchQuery}"</p>
+                )}
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-line flex items-center justify-between text-xs text-muted-foreground font-mono">
+                <span>Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-foreground">ESC</kbd> to exit</span>
+                <Link
+                  href="/catalog"
+                  onClick={() => setIsSearchOpen(false)}
+                  className="text-primary hover:underline flex items-center gap-1 font-semibold"
+                >
+                  View Full Catalog <ArrowRight size={13} />
+                </Link>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── MODAL 2: SHOPPING BAG QUICK CART DRAWER ──────────────── */}
+      <AnimatePresence>
+        {isCartOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCartOpen(false)}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 240 }}
+              className="fixed inset-y-0 right-0 w-[min(90vw,420px)] bg-card border-l border-primary/20 shadow-2xl z-[61] flex flex-col justify-between"
+            >
+              {/* Drawer Header */}
+              <div className="p-5 sm:p-6 border-b border-line flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                    <ShoppingBag size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg font-serif text-foreground">Shopping Bag</h3>
+                    <p className="text-xs text-muted-foreground font-mono">{getCartCount()} items selected</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsCartOpen(false)}
+                  className="p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Drawer Content */}
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
+                {cartItems.length > 0 ? (
+                  cartItems.map(item => (
+                    <div key={item.id} className="flex items-center gap-3.5 p-3 rounded-2xl bg-secondary/40 border border-line">
+                      <img src={item.image} alt={item.name} className="w-16 h-16 rounded-xl object-cover shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] font-bold text-primary font-mono uppercase">{item.brand}</span>
+                        <h5 className="text-xs font-bold text-foreground font-serif truncate">{item.name}</h5>
+                        <span className="text-xs font-bold text-foreground">₹{item.price.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 bg-background border border-line rounded-lg p-1">
+                        <button
+                          onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                          className="p-1 hover:text-primary"
+                        >
+                          <Minus size={12} />
+                        </button>
+                        <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="p-1 hover:text-primary"
+                        >
+                          <Plus size={12} />
+                        </button>
+                      </div>
+                      <button onClick={() => removeItem(item.id)} className="p-1.5 text-muted-foreground hover:text-destructive">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <ShoppingBag size={48} className="mx-auto text-muted-foreground/30 mb-3" />
+                    <h4 className="font-bold text-foreground font-serif text-base mb-1">Your bag is empty</h4>
+                    <p className="text-xs text-muted-foreground mb-6">Explore our luxury frames and add your favorite pair.</p>
+                    <Link
+                      href="/catalog"
+                      onClick={() => setIsCartOpen(false)}
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wider"
+                    >
+                      Browse Catalog <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Drawer Footer */}
+              {cartItems.length > 0 && (
+                <div className="p-5 sm:p-6 border-t border-line bg-background/80 space-y-3">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground font-medium">Subtotal</span>
+                    <span className="font-bold text-lg text-foreground">₹{getCartTotal().toLocaleString()}</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">✓ Includes free nationwide clinical optical shipping</p>
+                  <Link
+                    href="/cart"
+                    onClick={() => setIsCartOpen(false)}
+                    className="block w-full py-3.5 text-center rounded-xl bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-sm btn-brass-sweep border-none shadow-md"
+                  >
+                    Proceed to Checkout
+                  </Link>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── MODAL 3: WISHLIST QUICK DRAWER ────────────────────────── */}
+      <AnimatePresence>
+        {isWishlistOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsWishlistOpen(false)}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60]"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 240 }}
+              className="fixed inset-y-0 right-0 w-[min(90vw,420px)] bg-card border-l border-primary/20 shadow-2xl z-[61] flex flex-col justify-between"
+            >
+              <div className="p-5 sm:p-6 border-b border-line flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-xl bg-copper/10 text-copper">
+                    <Heart size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg font-serif text-foreground">Your Favorites</h3>
+                    <p className="text-xs text-muted-foreground font-mono">{wishlistCount} saved frames</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsWishlistOpen(false)}
+                  className="p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
+                {wishlistItems.length > 0 ? (
+                  wishlistItems.map((item: any, idx: number) => (
+                    <div key={idx} className="flex items-center gap-3.5 p-3 rounded-2xl bg-secondary/40 border border-line">
+                      <img src={item.image || item.image_url} alt={item.name} className="w-16 h-16 rounded-xl object-cover shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] font-bold text-primary font-mono uppercase">{item.brand || 'Mr & Mrs'}</span>
+                        <h5 className="text-xs font-bold text-foreground font-serif truncate">{item.name}</h5>
+                        <span className="text-xs font-bold text-foreground">₹{(item.price || 4999).toLocaleString()}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          addItem({ id: item.id || `wish-${idx}`, name: item.name, price: item.price || 4999, mrp: item.mrp || 6999, image: item.image || item.image_url, quantity: 1, brand: item.brand || 'Mr & Mrs' });
+                          setIsWishlistOpen(false);
+                          setIsCartOpen(true);
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 cursor-pointer"
+                      >
+                        Add to Bag
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <Heart size={48} className="mx-auto text-muted-foreground/30 mb-3" />
+                    <h4 className="font-bold text-foreground font-serif text-base mb-1">No saved frames yet</h4>
+                    <p className="text-xs text-muted-foreground mb-6">Save your favorite frames while browsing to view them anytime.</p>
+                    <Link
+                      href="/catalog"
+                      onClick={() => setIsWishlistOpen(false)}
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground text-xs font-semibold uppercase tracking-wider"
+                    >
+                      Explore Catalog <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-5 sm:p-6 border-t border-line bg-background/80">
+                <Link
+                  href="/wishlist"
+                  onClick={() => setIsWishlistOpen(false)}
+                  className="block w-full py-3.5 text-center rounded-xl bg-secondary hover:bg-primary/20 text-foreground font-bold text-sm border border-line"
+                >
+                  View Full Wishlist Page
+                </Link>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── MODAL 4: PHONE & CONCIERGE QUICK CONTACT MODAL ───────── */}
+      <AnimatePresence>
+        {isContactOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsContactOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.2 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-card border border-primary/30 rounded-3xl p-6 shadow-2xl z-[61] overflow-hidden"
+            >
+              <div className="flex items-center justify-between mb-5 pb-4 border-b border-line">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-primary/10 text-primary">
+                    <Phone size={22} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-xl font-serif text-foreground">Concierge Care</h3>
+                    <p className="text-xs text-primary font-medium">Mr. & Mrs. Optical Support</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsContactOpen(false)}
+                  className="p-1.5 rounded-full bg-secondary text-muted-foreground hover:text-foreground"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="space-y-3.5 mb-6">
+                {/* 1. Direct Phone Call */}
+                <a
+                  href="tel:+919876543210"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-primary/10 border border-primary/25 hover:bg-primary/20 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <Phone size={18} className="text-primary group-hover:scale-110 transition-transform" />
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary font-mono block">Direct Call</span>
+                      <span className="text-sm font-bold text-foreground">+91 98765 43210</span>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">Call Now</span>
+                </a>
+
+                {/* 2. Direct WhatsApp Chat */}
+                <a
+                  href="https://wa.me/919876543210?text=Hi%20Mr%20%26%20Mrs%20Optical,%20I%20would%20like%20to%20inquire%20about%20eyewear%20and%20consultation."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 hover:bg-emerald-500/20 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <MessageSquare size={18} className="text-emerald-500 group-hover:scale-110 transition-transform" />
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-mono block">WhatsApp Chat</span>
+                      <span className="text-sm font-bold text-foreground">Instant Assistance</span>
+                    </div>
+                  </div>
+                  <ExternalLink size={16} className="text-emerald-500" />
+                </a>
+
+                {/* 3. Store Visit */}
+                <a
+                  href="https://maps.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-secondary/60 border border-line hover:bg-secondary transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <MapPin size={18} className="text-primary" />
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground font-mono block">Surat Optical Store</span>
+                      <span className="text-xs text-foreground font-medium">Shop 1, Near City Mall, Surat</span>
+                    </div>
+                  </div>
+                  <span className="text-xs text-primary font-semibold">Directions</span>
+                </a>
+              </div>
+
+              <Button
+                onClick={() => { setIsContactOpen(false); openBookingModal(); }}
+                className="w-full py-6 text-sm bg-primary text-primary-foreground hover:bg-primary/95 btn-brass-sweep border-none rounded-2xl font-bold tracking-wider cursor-pointer"
+              >
+                Book Eye Test Appointment
+              </Button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Mobile Slide-Over Menu Panel ─────────────────────────── */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
@@ -318,13 +689,12 @@ export default function Navbar() {
 
               <nav className="flex flex-col px-4 py-4 gap-1 flex-1">
                 {[
-                  { label: 'Home',        href: '/' },
+                  { label: 'Home', href: '/' },
                   { label: 'Collections', href: '/catalog' },
-                  { label: 'Services',    href: '/services' },
-                  { label: 'Our Story',   href: '/about' },
-                  { label: 'Gallery',     href: '/gallery' },
-                  { label: 'Offers',      href: '/offers' },
-                  { label: `Wishlist (${wishlistCount})`, href: '/wishlist' },
+                  { label: 'Services', href: '/services' },
+                  { label: 'Our Story', href: '/about' },
+                  { label: 'Gallery', href: '/gallery' },
+                  { label: 'Offers', href: '/offers' },
                 ].map((item, idx) => (
                   <motion.div
                     key={item.href}
@@ -350,21 +720,12 @@ export default function Navbar() {
                 >
                   Book Eye Test
                 </Button>
-                <a href="tel:+919876543210" onClick={() => setIsMobileMenuOpen(false)} className="block">
-                  <Button
-                    variant="outline"
-                    className="w-full py-6 text-sm border-border hover:bg-muted rounded-full font-medium"
-                  >
-                    Call Us Now
-                  </Button>
-                </a>
-                <Link
-                  href="/admin"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 text-sm font-semibold text-primary py-2 hover:underline"
+                <button
+                  onClick={() => { setIsMobileMenuOpen(false); setIsContactOpen(true); }}
+                  className="w-full py-3.5 text-sm border border-border hover:bg-muted rounded-full font-medium text-foreground transition-colors cursor-pointer"
                 >
-                  <ShieldCheck size={14} /> Admin Portal
-                </Link>
+                  Call & Concierge Support
+                </button>
               </div>
             </motion.div>
           </>
