@@ -15,7 +15,7 @@ const bentoCards = [
     icon: Stethoscope,
     title: 'Computerized Eye Test',
     desc: 'State-of-the-art clinical precision for perfect vision mapping.',
-    image: '/generated/eye-test.jpg',
+    image: 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=900&auto=format&fit=crop',
     big: true,
     accent: 'from-emerald-950/90 via-emerald-950/60 to-transparent',
   },
@@ -24,7 +24,7 @@ const bentoCards = [
     icon: Award,
     title: 'Certified Experts',
     desc: 'Board-certified optometrists with 10+ years of clinical experience.',
-    image: '/generated/optometrist.jpg',
+    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=900&auto=format&fit=crop',
     big: false,
   },
   {
@@ -32,7 +32,7 @@ const bentoCards = [
     icon: Glasses,
     title: 'Premium Collections',
     desc: 'Curated luxury brands & international designer frames.',
-    image: '/generated/frames-display.jpg',
+    image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=900&auto=format&fit=crop',
     big: false,
   },
   {
@@ -40,7 +40,7 @@ const bentoCards = [
     icon: Eye,
     title: 'Contact Lenses',
     desc: 'Expert fitting for daily, monthly & speciality contact lenses.',
-    image: '/generated/contact-lens.jpg',
+    image: 'https://images.unsplash.com/photo-1573511860302-28c5243198e5?w=900&auto=format&fit=crop',
     big: false,
   },
   {
@@ -48,7 +48,7 @@ const bentoCards = [
     icon: Baby,
     title: 'Kids Vision',
     desc: 'Specialised paediatric eye care & durable, colourful frames.',
-    image: '/generated/kids-vision.jpg',
+    image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=900&auto=format&fit=crop',
     big: false,
   },
 ];
