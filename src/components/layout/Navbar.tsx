@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Heart, Phone, ChevronDown, Menu, X,
-  ArrowRight, ShoppingBag, ShieldCheck, Plus, Minus, Trash2, MapPin, MessageSquare, ExternalLink, Sparkles
+  ArrowRight, ShoppingBag, ShieldCheck, Plus, Minus, Trash2, MapPin, MessageSquare, ExternalLink, Sparkles, ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/ui/Logo';
 import { useCartStore } from '@/store/cartStore';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useBookingModal } from '@/store/bookingModalStore';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 // Sample products for live instant search
 const SEARCH_PRODUCTS = [
@@ -28,12 +28,18 @@ const SEARCH_PRODUCTS = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [wishlistItems, setWishlistItems] = useState<any[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
+  const [activeMegaMenu, setActiveMegaMenu] = useState<'collections' | 'services' | null>(null);
   const [mounted, setMounted] = useState(false);
+
+  // Mobile Menu Submenu Accordion state
+  const [mobileCollectionsOpen, setMobileCollectionsOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
 
   // 4 Interactive Modals/Drawers State
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -111,7 +117,23 @@ export default function Navbar() {
       );
 
   const navLinkCls =
-    'text-xs xl:text-sm font-semibold uppercase tracking-wider xl:tracking-widest transition-colors duration-200 relative group hover:text-primary whitespace-nowrap';
+    'text-xs xl:text-sm font-semibold uppercase tracking-wider xl:tracking-widest transition-colors duration-200 relative group hover:text-primary whitespace-nowrap cursor-pointer';
+
+  const collectionCategories = [
+    { name: 'Luxury Men Eyewear', desc: 'Crafted for modern gentlemen', href: '/catalog?category=men' },
+    { name: 'Luxury Women Eyewear', desc: 'Elegant statement frames & pearls', href: '/catalog?category=women' },
+    { name: 'Computer & Screen Glasses', desc: 'Blue-cut strain protection lenses', href: '/catalog?category=computer' },
+    { name: 'Designer Sunglasses', desc: 'UV400 polarized luxury sunshades', href: '/catalog?category=sunglasses' },
+    { name: 'Contact Lenses & Care', desc: 'Daily, monthly & colored contact lenses', href: '/catalog?category=lenses' },
+  ];
+
+  const serviceCategories = [
+    { name: 'Computerized Eye Testing', desc: 'Precision digital refraction & prescription analysis', href: '/services#eye-test' },
+    { name: 'Frame Styling Consultation', desc: 'Personalized face-shape & skin-tone frame matching', href: '/services#styling' },
+    { name: 'Contact Lens Fitting', desc: 'Clinical keratomertry & trial fitting service', href: '/services#contact-lens' },
+    { name: 'Lens Replacement', desc: 'Upgrade old frames with new prescription lenses', href: '/services#lens' },
+    { name: 'Repair & Adjustments', desc: 'Free alignment, nose-pad & screw restoration', href: '/services#repair' },
+  ];
 
   return (
     <>
@@ -139,29 +161,41 @@ export default function Navbar() {
                 <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary transition-all duration-300 group-hover:w-full" />
               </Link>
 
-              <button
-                className={`${navLinkCls} flex items-center gap-1 py-5 cursor-pointer`}
+              {/* Collections Button & Hover Mega Menu */}
+              <div
+                className="relative group py-5"
                 onMouseEnter={() => setActiveMegaMenu('collections')}
               >
-                Collections
-                <ChevronDown
-                  size={13}
-                  className={`transition-transform duration-200 ${activeMegaMenu === 'collections' ? 'rotate-180' : ''}`}
-                />
-                <span className="absolute bottom-3 left-0 w-0 h-[1.5px] bg-primary transition-all duration-300 group-hover:w-full" />
-              </button>
+                <Link
+                  href="/catalog"
+                  className={`${navLinkCls} flex items-center gap-1`}
+                >
+                  <span>Collections</span>
+                  <ChevronDown
+                    size={13}
+                    className={`transition-transform duration-200 ${activeMegaMenu === 'collections' ? 'rotate-180 text-primary' : ''}`}
+                  />
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary transition-all duration-300 group-hover:w-full" />
+                </Link>
+              </div>
 
-              <button
-                className={`${navLinkCls} flex items-center gap-1 py-5 cursor-pointer`}
+              {/* Services Button & Hover Mega Menu */}
+              <div
+                className="relative group py-5"
                 onMouseEnter={() => setActiveMegaMenu('services')}
               >
-                Services
-                <ChevronDown
-                  size={13}
-                  className={`transition-transform duration-200 ${activeMegaMenu === 'services' ? 'rotate-180' : ''}`}
-                />
-                <span className="absolute bottom-3 left-0 w-0 h-[1.5px] bg-primary transition-all duration-300 group-hover:w-full" />
-              </button>
+                <Link
+                  href="/services"
+                  className={`${navLinkCls} flex items-center gap-1`}
+                >
+                  <span>Services</span>
+                  <ChevronDown
+                    size={13}
+                    className={`transition-transform duration-200 ${activeMegaMenu === 'services' ? 'rotate-180 text-primary' : ''}`}
+                  />
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary transition-all duration-300 group-hover:w-full" />
+                </Link>
+              </div>
 
               <Link href="/about" className={navLinkCls}>
                 Our Story
@@ -255,6 +289,122 @@ export default function Navbar() {
 
           </div>
         </div>
+
+        {/* ── DESKTOP MEGA MENU DROPDOWN PANEL (FOR COLLECTIONS & SERVICES) ── */}
+        <AnimatePresence>
+          {activeMegaMenu && (
+            <motion.div
+              key={activeMegaMenu}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="absolute top-full left-0 right-0 bg-background/98 backdrop-blur-xl shadow-2xl border-t border-b border-border text-foreground"
+              onMouseEnter={() => setActiveMegaMenu(activeMegaMenu)}
+              onMouseLeave={() => setActiveMegaMenu(null)}
+            >
+              <div className="container mx-auto px-6 sm:px-12 py-8">
+                {activeMegaMenu === 'collections' ? (
+                  <div className="grid grid-cols-12 gap-8 items-center">
+                    <div className="col-span-7">
+                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-line">
+                        <span className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-bold">
+                          Explore Collections Catalog
+                        </span>
+                        <Link href="/catalog" onClick={() => setActiveMegaMenu(null)} className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
+                          View All Frames <ArrowRight size={13} />
+                        </Link>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        {collectionCategories.map((item, idx) => (
+                          <Link
+                            key={idx}
+                            href={item.href}
+                            onClick={() => setActiveMegaMenu(null)}
+                            className="p-3.5 rounded-2xl bg-card hover:bg-primary/10 border border-line hover:border-primary/30 transition-all group"
+                          >
+                            <h5 className="text-sm font-bold text-foreground font-serif group-hover:text-primary transition-colors flex items-center justify-between">
+                              <span>{item.name}</span>
+                              <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+                            </h5>
+                            <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="col-span-5 relative h-56 rounded-3xl overflow-hidden border border-primary/20 shadow-xl group">
+                      <img
+                        src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&auto=format&fit=crop"
+                        alt="Luxury Eyewear Collection"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6 flex flex-col justify-end">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-amber-300 font-bold mb-1">Featured Showcase</span>
+                        <h4 className="text-xl font-bold font-serif text-white mb-2">2026 Titanium & Pearl Frames</h4>
+                        <Link href="/catalog" onClick={() => setActiveMegaMenu(null)}>
+                          <Button size="sm" className="bg-primary text-primary-foreground font-semibold text-xs rounded-xl">
+                            Shop New Arrivals
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-12 gap-8 items-center">
+                    <div className="col-span-7">
+                      <div className="flex items-center justify-between mb-4 pb-2 border-b border-line">
+                        <span className="font-mono text-xs uppercase tracking-[0.2em] text-primary font-bold">
+                          Clinical & Optical Services
+                        </span>
+                        <Link href="/services" onClick={() => setActiveMegaMenu(null)} className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
+                          View All Services <ArrowRight size={13} />
+                        </Link>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        {serviceCategories.map((item, idx) => (
+                          <Link
+                            key={idx}
+                            href={item.href}
+                            onClick={() => setActiveMegaMenu(null)}
+                            className="p-3.5 rounded-2xl bg-card hover:bg-primary/10 border border-line hover:border-primary/30 transition-all group"
+                          >
+                            <h5 className="text-sm font-bold text-foreground font-serif group-hover:text-primary transition-colors flex items-center justify-between">
+                              <span>{item.name}</span>
+                              <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
+                            </h5>
+                            <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="col-span-5 relative h-56 rounded-3xl overflow-hidden border border-primary/20 shadow-xl group">
+                      <img
+                        src="https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=800&auto=format&fit=crop"
+                        alt="Clinical Optometry"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6 flex flex-col justify-end">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-amber-300 font-bold mb-1">Clinical Care</span>
+                        <h4 className="text-xl font-bold font-serif text-white mb-2">Free Computerized Eye Test</h4>
+                        <Button
+                          onClick={() => { setActiveMegaMenu(null); openBookingModal(); }}
+                          size="sm"
+                          className="bg-primary text-primary-foreground font-semibold text-xs rounded-xl"
+                        >
+                          Book Appointment Now
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* ── MODAL 1: INSTANT LIVE SEARCH MODAL (Cmd + K) ─────────── */}
@@ -570,7 +720,7 @@ export default function Navbar() {
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              exit={{ opacity: 0, scale: 0.95, y: 0 }}
               transition={{ duration: 0.2 }}
               className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md bg-card border border-primary/30 rounded-3xl p-6 shadow-2xl z-[61] overflow-hidden"
             >
@@ -688,29 +838,105 @@ export default function Navbar() {
               </div>
 
               <nav className="flex flex-col px-4 py-4 gap-1 flex-1">
-                {[
-                  { label: 'Home', href: '/' },
-                  { label: 'Collections', href: '/catalog' },
-                  { label: 'Services', href: '/services' },
-                  { label: 'Our Story', href: '/about' },
-                  { label: 'Gallery', href: '/gallery' },
-                  { label: 'Offers', href: '/offers' },
-                ].map((item, idx) => (
-                  <motion.div
-                    key={item.href}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.28, delay: 0.04 + idx * 0.05 }}
+                {/* 1. Home */}
+                <Link
+                  href="/"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                >
+                  Home
+                </Link>
+
+                {/* 2. Collections (Expandable Accordion) */}
+                <div className="rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setMobileCollectionsOpen(!mobileCollectionsOpen)}
+                    className="w-full flex items-center justify-between py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
                   >
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block py-3.5 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all duration-200"
-                    >
-                      {item.label}
-                    </Link>
-                  </motion.div>
-                ))}
+                    <span>Collections</span>
+                    <ChevronDown size={16} className={`transition-transform ${mobileCollectionsOpen ? 'rotate-180 text-primary' : ''}`} />
+                  </button>
+                  {mobileCollectionsOpen && (
+                    <div className="pl-4 pr-2 py-2 space-y-2 bg-secondary/30 rounded-xl my-1 border border-line">
+                      {collectionCategories.map((cat, i) => (
+                        <Link
+                          key={i}
+                          href={cat.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block text-xs font-medium text-muted-foreground hover:text-primary py-1.5"
+                        >
+                          • {cat.name}
+                        </Link>
+                      ))}
+                      <Link
+                        href="/catalog"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block text-xs font-bold text-primary py-1.5 border-t border-line mt-1"
+                      >
+                        View All Collections →
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. Services (Expandable Accordion) */}
+                <div className="rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
+                    className="w-full flex items-center justify-between py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                  >
+                    <span>Services</span>
+                    <ChevronDown size={16} className={`transition-transform ${mobileServicesOpen ? 'rotate-180 text-primary' : ''}`} />
+                  </button>
+                  {mobileServicesOpen && (
+                    <div className="pl-4 pr-2 py-2 space-y-2 bg-secondary/30 rounded-xl my-1 border border-line">
+                      {serviceCategories.map((serv, i) => (
+                        <Link
+                          key={i}
+                          href={serv.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block text-xs font-medium text-muted-foreground hover:text-primary py-1.5"
+                        >
+                          • {serv.name}
+                        </Link>
+                      ))}
+                      <Link
+                        href="/services"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block text-xs font-bold text-primary py-1.5 border-t border-line mt-1"
+                      >
+                        View All Services →
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                {/* 4. Our Story */}
+                <Link
+                  href="/about"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                >
+                  Our Story
+                </Link>
+
+                {/* 5. Gallery */}
+                <Link
+                  href="/gallery"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                >
+                  Gallery
+                </Link>
+
+                {/* 6. Offers */}
+                <Link
+                  href="/offers"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
+                >
+                  Offers
+                </Link>
               </nav>
 
               <div className="px-6 pb-8 space-y-3 border-t border-border pt-5">
