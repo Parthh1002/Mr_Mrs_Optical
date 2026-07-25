@@ -184,19 +184,19 @@ export default function HeroBannerCarousel({ slides = DEFAULT_SLIDES, autoPlayMs
           exit="exit"
           className="absolute inset-0 w-full h-full"
         >
-          {/* Background image with Ken Burns zoom */}
+          {/* Background image with Ken Burns zoom & optimized mobile focus */}
           <motion.img
             src={slide.image}
             alt={slide.headline}
-            className="absolute inset-0 w-full h-full object-cover object-center"
-            initial={{ scale: 1.08 }}
+            className="absolute inset-0 w-full h-full object-cover object-center max-sm:object-[center_25%]"
+            initial={{ scale: 1.05 }}
             animate={{ scale: 1 }}
             transition={{ duration: 6, ease: 'linear' }}
           />
 
-          {/* Gradient scrim */}
-          <div className={`absolute inset-0 bg-gradient-to-r ${slide.overlay}`} />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-70" />
+          {/* Gradient scrim with lighter mobile overlay so background image is fully clear */}
+          <div className={`absolute inset-0 bg-gradient-to-r ${slide.overlay} max-sm:opacity-75`} />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60 max-sm:opacity-40" />
         </motion.div>
       </AnimatePresence>
 
