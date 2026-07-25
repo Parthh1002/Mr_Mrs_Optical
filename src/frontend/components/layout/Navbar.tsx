@@ -111,7 +111,7 @@ export default function Navbar() {
       );
 
   const navLinkCls =
-    'text-sm font-medium uppercase tracking-widest transition-colors duration-200 relative group hover:text-primary';
+    'text-xs xl:text-sm font-semibold uppercase tracking-wider xl:tracking-widest transition-colors duration-200 relative group hover:text-primary whitespace-nowrap';
 
   return (
     <>
@@ -133,7 +133,7 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-8 absolute left-1/2 -translate-x-1/2">
+            <nav className="hidden lg:flex items-center space-x-4 xl:space-x-8 mx-auto px-4">
               <Link href="/" className={navLinkCls}>
                 Home
                 <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary transition-all duration-300 group-hover:w-full" />
