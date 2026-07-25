@@ -138,9 +138,18 @@ export default function Navbar() {
   ];
 
   const handleHomeClick = (e: React.MouseEvent) => {
+    triggerHaptic('light');
     if (pathname === '/') {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      e.preventDefault();
+      router.push('/');
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }, 80);
     }
   };
 
