@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { getActiveProducts } from '@/lib/api';
 import { useCartStore } from '@/store/cartStore';
 import { useBookingModal } from '@/store/bookingModalStore';
+import { triggerHaptic } from '@/lib/haptics';
 
 const MOCK_PRODUCTS = [
   {
@@ -187,6 +188,7 @@ function CatalogContent() {
   const toggleWishlist = (e: React.MouseEvent, productId: string) => {
     e.preventDefault();
     e.stopPropagation();
+    triggerHaptic('medium');
     let saved = localStorage.getItem('mrandmrs_wishlist') 
       ? JSON.parse(localStorage.getItem('mrandmrs_wishlist')!) 
       : [];
@@ -208,6 +210,7 @@ function CatalogContent() {
 
   const handleAddToCartFromModal = () => {
     if (!selectedProduct) return;
+    triggerHaptic('success');
     
     const finalPrice = selectedProduct.price + selectedLens.price;
     addItemToCart({

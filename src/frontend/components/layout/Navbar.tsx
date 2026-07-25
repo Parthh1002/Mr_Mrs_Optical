@@ -13,6 +13,7 @@ import { useCartStore } from '@/store/cartStore';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useBookingModal } from '@/store/bookingModalStore';
 import { usePathname, useRouter } from 'next/navigation';
+import { initGlobalHaptics, triggerHaptic } from '@/lib/haptics';
 
 // Sample products for live instant search
 const SEARCH_PRODUCTS = [
@@ -69,6 +70,7 @@ export default function Navbar() {
   useEffect(() => {
     setMounted(true);
     updateWishlist();
+    initGlobalHaptics();
     window.addEventListener('wishlistUpdated', updateWishlist);
     return () => window.removeEventListener('wishlistUpdated', updateWishlist);
   }, [updateWishlist]);
