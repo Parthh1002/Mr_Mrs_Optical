@@ -135,6 +135,13 @@ export default function Navbar() {
     { name: 'Repair & Adjustments', desc: 'Free alignment, nose-pad & screw restoration', href: '/services#repair' },
   ];
 
+  const handleHomeClick = (e: React.MouseEvent) => {
+    if (pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
       {/* ── Main Navbar Header ───────────────────────────────────── */}
@@ -150,13 +157,13 @@ export default function Navbar() {
           <div className="flex items-center justify-between">
 
             {/* Logo */}
-            <Link href="/" className="flex-shrink-0 z-50">
+            <Link href="/" onClick={handleHomeClick} className="flex-shrink-0 z-50 cursor-pointer">
               <Logo />
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-4 xl:space-x-8 mx-auto px-4">
-              <Link href="/" className={navLinkCls}>
+              <Link href="/" onClick={handleHomeClick} className={navLinkCls}>
                 Home
                 <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary transition-all duration-300 group-hover:w-full" />
               </Link>
@@ -841,7 +848,7 @@ export default function Navbar() {
                 {/* 1. Home */}
                 <Link
                   href="/"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(e) => { setIsMobileMenuOpen(false); handleHomeClick(e); }}
                   className="block py-3 px-3 text-base font-[family-name:var(--font-serif)] hover:text-primary hover:bg-primary/5 rounded-xl transition-all"
                 >
                   Home
