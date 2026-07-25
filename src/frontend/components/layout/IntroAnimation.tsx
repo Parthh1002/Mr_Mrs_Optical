@@ -10,52 +10,43 @@ interface Point3D {
 }
 
 export default function IntroAnimation() {
-  const [shouldPlay, setShouldPlay] = useState(false);
+  const [isDone, setIsDone] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const logoWrapperRef = useRef<HTMLDivElement>(null);
   const wordmarkRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
 
-  // Check once if intro has already played this session
   useEffect(() => {
+    // Check if intro has already played in this session
     const hasPlayed = sessionStorage.getItem('mrmrs_intro_played');
-    setShouldPlay(!hasPlayed);
-  }, []);
+    if (hasPlayed) {
+      setIsDone(true);
+      return;
+    }
 
-  useEffect(() => {
-    if (!shouldPlay) return;
-
-    // Lock scroll during intro — use body class for iOS fix
+    // Lock scroll during intro
     document.body.classList.add('overlay-open');
 
-    // ── RESPONSIVE CANVAS SIZE ──────────────────────────────────
     let animationFrameId: number;
     const canvas = canvasRef.current;
 
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        // Responsive: scale canvas to device pixel ratio for crisp rendering
         const dpr = window.devicePixelRatio || 1;
         const isMobile = window.innerWidth < 640;
 
-        // Logical size (CSS pixels)
         const logicalW = isMobile ? 220 : 340;
         const logicalH = isMobile ? 130 : 200;
 
-        // Physical pixels
         canvas.width  = logicalW * dpr;
         canvas.height = logicalH * dpr;
 
-        // CSS size stays at logical
         canvas.style.width  = `${logicalW}px`;
         canvas.style.height = `${logicalH}px`;
 
-        // Scale ctx so coordinates work in logical pixels
         ctx.scale(dpr, dpr);
-
-        // Scale factor: mobile gets 65% of desktop
         const sf = isMobile ? 0.62 : 1;
 
         let angleY    = -Math.PI / 4;
@@ -64,7 +55,6 @@ export default function IntroAnimation() {
         let pulseVal  = 0;
         let shimmerPos = -50;
 
-        // ── Geometry ───────────────────────────────────────────
         const leftRimPoints:   Point3D[] = [];
         const rightRimPoints:  Point3D[] = [];
         const bridgePoints:    Point3D[] = [];
@@ -110,7 +100,6 @@ export default function IntroAnimation() {
           });
         }
 
-        // ── Math helpers ──────────────────────────────────────
         const rotate = (p: Point3D, rX: number, rY: number, rZ: number): Point3D => {
           let cos = Math.cos(rY), sin = Math.sin(rY);
           const x1 = p.x * cos - p.z * sin;
@@ -178,7 +167,6 @@ export default function IntroAnimation() {
           ctx.shadowBlur  = 0;
         };
 
-        // ── Render loop (60 FPS via rAF) ──────────────────────
         const renderLoop = () => {
           angleY     += 0.011;
           angleX      = -0.15 + Math.sin(pulseVal) * 0.07;
@@ -213,16 +201,14 @@ export default function IntroAnimation() {
       }
     }
 
-    // ── GSAP Timeline ─────────────────────────────────────────
     const tl = gsap.timeline({
       onComplete: () => {
         sessionStorage.setItem('mrmrs_intro_played', 'true');
         document.body.classList.remove('overlay-open');
-        setShouldPlay(false);
+        setIsDone(true);
       },
     });
 
-    // Initial states
     gsap.set(logoWrapperRef.current, { opacity: 0, scale: 1.25, filter: 'blur(18px) saturate(0.1)' });
     gsap.set(wordmarkRef.current,    { opacity: 0, y: 24 });
     gsap.set(lineRef.current,        { scaleX: 0 });
@@ -230,77 +216,63 @@ export default function IntroAnimation() {
     gsap.set('#intro-glow',          { opacity: 0, scale: 0.75 });
 
     tl
-      // 1. Background env reveals
-      .to('#intro-grid', { opacity: 0.06, duration: 0.9, ease: 'power2.out' })
-      .to('#intro-glow', { opacity: 1, scale: 1, duration: 1.1, ease: 'expo.out' }, '-=0.7')
-
-      // 2. Logo — blur-to-sharp scale-in (premium focus-pull)
+      .to('#intro-grid', { opacity: 0.06, duration: 0.8, ease: 'power2.out' })
+      .to('#intro-glow', { opacity: 1, scale: 1, duration: 1.0, ease: 'expo.out' }, '-=0.6')
       .to(logoWrapperRef.current, {
         opacity: 1,
         scale: 1,
         filter: 'blur(0px) saturate(1)',
-        duration: 1.2,
+        duration: 1.1,
         ease: 'expo.out',
-      }, '-=0.8')
-
-      // 3. Wordmark slides up
-      .to(wordmarkRef.current, { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' }, '-=0.55')
-
-      // 4. Gold separator line
-      .to(lineRef.current, { scaleX: 1, duration: 0.7, ease: 'expo.out' }, '-=0.35')
-
-      // 5. Slight hold — let the beauty breathe
-      .to({}, { duration: 0.55 })
-
-      // 6. Boutique shutter doors reveal
+      }, '-=0.7')
+      .to(wordmarkRef.current, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.5')
+      .to(lineRef.current, { scaleX: 1, duration: 0.6, ease: 'expo.out' }, '-=0.3')
+      .to({}, { duration: 0.5 })
       .to('#intro-door-left', {
         xPercent: -100,
-        duration: 1.05,
+        duration: 1.0,
         ease: 'power3.inOut',
       })
       .to('#intro-door-right', {
         xPercent: 100,
-        duration: 1.05,
+        duration: 1.0,
         ease: 'power3.inOut',
       }, '<')
-      .to('#intro-grid, #intro-glow', {
+      .to('#intro-grid, #intro-glow, #intro-content', {
         opacity: 0,
-        duration: 0.5,
+        duration: 0.4,
         ease: 'power2.inOut',
-      }, '-=0.85')
-
-      // 7. Hide container (no layout shift)
-      .set(containerRef.current, { display: 'none' });
+      }, '-=0.8');
 
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
       tl.kill();
       document.body.classList.remove('overlay-open');
     };
-  }, [shouldPlay]);
+  }, []);
 
-  if (!shouldPlay) return null;
+  if (isDone) return null;
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-[#0D1512]"
     >
       {/* Left Shutter Door */}
       <div
         id="intro-door-left"
-        className="absolute inset-y-0 left-0 w-1/2 bg-[#0D1512] border-r border-[#D0A64E]/8"
+        className="absolute inset-y-0 left-0 w-1/2 bg-[#0D1512] border-r border-[#D0A64E]/10 z-10"
       />
       {/* Right Shutter Door */}
       <div
         id="intro-door-right"
-        className="absolute inset-y-0 right-0 w-1/2 bg-[#0D1512]"
+        className="absolute inset-y-0 right-0 w-1/2 bg-[#0D1512] z-10"
       />
 
       {/* Snellen Grid Texture */}
       <div
         id="intro-grid"
-        className="absolute inset-0 select-none pointer-events-none mix-blend-screen text-[#D0A64E]/30"
+        className="absolute inset-0 select-none pointer-events-none mix-blend-screen text-[#D0A64E]/30 z-20"
       >
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -319,12 +291,12 @@ export default function IntroAnimation() {
       {/* Radial Gold Glow */}
       <div
         id="intro-glow"
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20"
         style={{
           width: 'min(600px, 90vw)',
           height: 'min(600px, 90vw)',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(208,166,78,0.06) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(208,166,78,0.08) 0%, transparent 70%)',
           filter: 'blur(60px)',
         }}
       />
@@ -332,7 +304,7 @@ export default function IntroAnimation() {
       {/* Center Logo Content */}
       <div
         id="intro-content"
-        className="relative z-10 flex flex-col items-center gap-5 px-4"
+        className="relative z-30 flex flex-col items-center gap-5 px-4"
       >
         {/* 3D Canvas */}
         <div
